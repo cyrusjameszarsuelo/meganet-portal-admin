@@ -1,0 +1,1 @@
+$('.tableUsage').dataTable();
