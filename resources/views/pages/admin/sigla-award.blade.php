@@ -49,6 +49,7 @@
                                                                 <th>ID</th>
                                                                 <th>Content</th>
                                                                 <th>Image</th>
+                                                                <th>Date Created</th>
                                                                 <th>Action</th>
                                                             </tr>
                                                         </thead>
@@ -59,6 +60,7 @@
                                                                     <td>{{ $sigla->content }}</td>
                                                                     <td><img src="{{ asset('uploads/sigla-awards-image/' . $sigla->image) }}"
                                                                             alt="" width="20%"></td>
+                                                                    <td>{{ $sigla->created_at }}</td>
                                                                     <td>
                                                                         <div class="btn-group">
                                                                             <a class="btn btn-primary"

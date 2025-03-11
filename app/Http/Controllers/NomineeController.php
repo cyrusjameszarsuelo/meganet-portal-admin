@@ -17,6 +17,7 @@ class NomineeController extends Controller
     public function index()
     {
         $nominees = Nominee::whereNotNull('name')
+            ->where('created_at', '>=', '2025-03-10 00:00:00')
             ->get();
 
         $topEmployee = Nominee::select(DB::raw('COUNT(*) as nomineeCount, name, department'))
@@ -34,6 +35,7 @@ class NomineeController extends Controller
     public function team()
     {
         $nominees = Nominee::whereNull('name')
+            ->where('created_at', '>=', '2025-03-10 00:00:00')
             ->get();
 
         return view('pages.admin.team-nomination')
