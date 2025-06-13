@@ -88,10 +88,26 @@
                                     <div class="col-md-12">
                                         @php
                                             $quarters = [
-                                                ['label' => 'Q1', 'start' => '2024-01-10 00:00:00', 'end' => '2025-03-10 23:59:59'],
-                                                ['label' => 'Q2', 'start' => '2025-03-10 00:00:00', 'end' => '2025-07-09 23:59:59'],
-                                                ['label' => 'Q3', 'start' => '2025-07-10 00:00:00', 'end' => '2025-10-09 23:59:59'],
-                                                ['label' => 'Q4', 'start' => '2025-10-10 00:00:00', 'end' => '2026-01-09 23:59:59'],
+                                                [
+                                                    'label' => 'Q1',
+                                                    'start' => '2024-01-10 00:00:00',
+                                                    'end' => '2025-03-10 23:59:59',
+                                                ],
+                                                [
+                                                    'label' => 'Q2',
+                                                    'start' => '2025-03-10 00:00:00',
+                                                    'end' => '2025-07-09 23:59:59',
+                                                ],
+                                                [
+                                                    'label' => 'Q3',
+                                                    'start' => '2025-07-10 00:00:00',
+                                                    'end' => '2025-10-09 23:59:59',
+                                                ],
+                                                [
+                                                    'label' => 'Q4',
+                                                    'start' => '2025-10-10 00:00:00',
+                                                    'end' => '2026-01-09 23:59:59',
+                                                ],
                                             ];
                                         @endphp
 
@@ -99,13 +115,13 @@
                                             <ul class="nav nav-tabs" id="custom-tabs-quarter-tab" role="tablist">
                                                 @foreach ($quarters as $i => $quarter)
                                                     <li class="nav-item">
-                                                        <a class="nav-link @if($i === 0) active @endif"
-                                                           id="custom-tabs-quarter-{{ $quarter['label'] }}-tab"
-                                                           data-toggle="pill"
-                                                           href="#custom-tabs-quarter-{{ $quarter['label'] }}"
-                                                           role="tab"
-                                                           aria-controls="custom-tabs-quarter-{{ $quarter['label'] }}"
-                                                           aria-selected="{{ $i === 0 ? 'true' : 'false' }}">{{ $quarter['label'] }}</a>
+                                                        <a class="nav-link @if ($i === 0) active @endif"
+                                                            id="custom-tabs-quarter-{{ $quarter['label'] }}-tab"
+                                                            data-toggle="pill"
+                                                            href="#custom-tabs-quarter-{{ $quarter['label'] }}"
+                                                            role="tab"
+                                                            aria-controls="custom-tabs-quarter-{{ $quarter['label'] }}"
+                                                            aria-selected="{{ $i === 0 ? 'true' : 'false' }}">{{ $quarter['label'] }}</a>
                                                     </li>
                                                 @endforeach
                                             </ul>
@@ -113,10 +129,9 @@
                                         <div class="card-body">
                                             <div class="tab-content" id="custom-tabs-quarter-tabContent">
                                                 @foreach ($quarters as $i => $quarter)
-                                                    <div class="tab-pane fade @if($i === 0) show active @endif"
-                                                         id="custom-tabs-quarter-{{ $quarter['label'] }}"
-                                                         role="tabpanel"
-                                                         aria-labelledby="custom-tabs-quarter-{{ $quarter['label'] }}-tab">
+                                                    <div class="tab-pane fade @if ($i === 0) show active @endif"
+                                                        id="custom-tabs-quarter-{{ $quarter['label'] }}" role="tabpanel"
+                                                        aria-labelledby="custom-tabs-quarter-{{ $quarter['label'] }}-tab">
                                                         <table class="table table-bordered table-striped nomination">
                                                             <thead>
                                                                 <tr>
@@ -136,12 +151,14 @@
                                                                         <td>{{ $nominee->department }}</td>
                                                                         <td>
                                                                             @foreach ($nominee->nomineeValue as $value)
-                                                                                <span class="right badge badge-primary">{{ $value->ourValue->value }}</span>
+                                                                                <span
+                                                                                    class="right badge badge-primary">{{ $value->ourValue->value }}</span>
                                                                             @endforeach
                                                                         </td>
                                                                         <td>
                                                                             @foreach ($nominee->nomineeBehavior as $behavior)
-                                                                                <span class="right badge badge-primary">{{ Str::limit($behavior->behavior->behavior, 20) }}</span>
+                                                                                <span
+                                                                                    class="right badge badge-primary">{{ Str::limit($behavior->behavior->behavior, 20) }}</span>
                                                                             @endforeach
                                                                         </td>
                                                                         <td>{{ $nominee->critical_incidents }}</td>
@@ -155,18 +172,18 @@
                                                 @endforeach
                                             </div>
                                         </div>
-                                            </div>
-                                        </div>
-                                        <!-- /.card -->
-
                                     </div>
                                 </div>
+                                <!-- /.card -->
+
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+    </div>
+    </div>
+    </section>
     </div>
 @endsection
 
