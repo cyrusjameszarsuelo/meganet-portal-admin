@@ -67,8 +67,8 @@ class MainController extends Controller
             // 'folder' => 'videos'
             // ])->getSecurePath();
 
-            $filename = $request->file;
-            $filenameVideo = date('YmdHis') . '.' . $request->file->extension();
+            $filename = $request->image;
+            $filenameVideo = date('YmdHis') . '.' . $request->image->extension();
             $filename->move(public_path('/uploads/Banner'), $filenameVideo);
 
         } else {
