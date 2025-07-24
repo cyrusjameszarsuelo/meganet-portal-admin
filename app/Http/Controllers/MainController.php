@@ -36,7 +36,7 @@ class MainController extends Controller
             ->withBannerQuestions($bannerQuestions);
     }
 
-    
+
     public function create($id = null)
     {
         $bannerQuestions = BannerQuestion::find($id);
@@ -55,25 +55,39 @@ class MainController extends Controller
     {
         $bannerQuestion = new BannerQuestion;
 
+        // if ($request->hasFile('image')) {
+        //     $filename = cloudinary()->upload(request()->image->getRealPath())->getSecurePath();
+        // } else {
+        //     $filename = '';
+        // }
+
         if ($request->hasFile('image')) {
-            $filename = cloudinary()->upload(request()->image->getRealPath())->getSecurePath();
+
+            // $filename = cloudinary()->uploadVideo($request->file('file')->getRealPath(), [
+            // 'folder' => 'videos'
+            // ])->getSecurePath();
+
+            $filename = $request->file;
+            $filenameVideo = date('YmdHis') . '.' . $request->file->extension();
+            $filename->move(public_path('/uploads/Banner'), $filenameVideo);
+
         } else {
-            $filename = '';
+            $filenameVideo = '';
         }
 
         $bannerQuestion->title = $request->title;
         $bannerQuestion->question = $request->question;
-        $bannerQuestion->image = $filename;
+        $bannerQuestion->image = $filenameVideo;
 
         $bannerQuestion->save();
 
         return redirect('/main/view-all-bannerQuestions');
     }
 
-    public function usage() 
+    public function usage()
     {
         // $_GET['dateRange'];
-        if(isset($_GET['dateRange'])) {
+        if (isset($_GET['dateRange'])) {
             list($date1, $date2) = explode(' - ', $_GET['dateRange']);
         } else {
             $date1 = '';
@@ -81,25 +95,25 @@ class MainController extends Controller
         }
 
         $metrics = Metric::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->groupBy('user')
-        ->get();
+            ->groupBy('user')
+            ->get();
 
         $corporateOffices = CorporateOffice::all();
-        
+
         return view('pages.admin.usage')
             ->withCorporateOffices($corporateOffices)
             ->withMetrics($metrics);
     }
 
-    public function conversionRate() 
+    public function conversionRate()
     {
 
-        if(isset($_GET['dateRange'])) {
+        if (isset($_GET['dateRange'])) {
             list($date1, $date2) = explode(' - ', $_GET['dateRange']);
         } else {
             $date1 = '';
@@ -107,15 +121,15 @@ class MainController extends Controller
         }
 
         $metricAllMeganews = Metric::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->where('action', 'Meganews')
-        ->whereNotNull('action_val')
-        ->groupBy( 'user', 'action_val')
-        ->get();
+            ->where('action', 'Meganews')
+            ->whereNotNull('action_val')
+            ->groupBy('user', 'action_val')
+            ->get();
 
         // dd($metrics->where('action', 'Meganews')->whereNotNull('action_val')->groupBy('user'));
 
@@ -123,8 +137,8 @@ class MainController extends Controller
         $megatriviaAnswers = MegatriviaAnswer::orderBy('created_at', 'DESC')
             ->groupBy('user', 'megatrivia_id')
             ->where(function ($query) use ($date1, $date2) {
-                if($date1) {
-                    $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+                if ($date1) {
+                    $query->where('created_at', '>=', $date1 . ' 00:00:00');
                     $query->where('created_at', '<=', $date2 . ' 23:59:59');
                 }
             })
@@ -133,8 +147,8 @@ class MainController extends Controller
         $metricMeganews = Metric::select(DB::raw('count(*) as totalVisitor'), 'm.title as title')
             ->leftJoin('meganews as m', 'm.id', '=', 'metrics.action_val')
             ->where(function ($query) use ($date1, $date2) {
-                if($date1) {
-                    $query->where('metrics.created_at', '>=', $date1 . ' 00:00:00' );   
+                if ($date1) {
+                    $query->where('metrics.created_at', '>=', $date1 . ' 00:00:00');
                     $query->where('metrics.created_at', '<=', $date2 . ' 23:59:59');
                 }
             })
@@ -143,26 +157,26 @@ class MainController extends Controller
             ->groupBy('action_val')
             ->get();
 
-        $meganewsGroups = Metric::select('*', DB::raw('count(*) as totalVisitor'), DB::raw('count(m.id) as `data`'), DB::raw("DATE_FORMAT(m.created_at, '%m-%Y') new_date"),  DB::raw('YEAR(m.created_at) year, MONTH(m.created_at) month'))
+        $meganewsGroups = Metric::select('*', DB::raw('count(*) as totalVisitor'), DB::raw('count(m.id) as `data`'), DB::raw("DATE_FORMAT(m.created_at, '%m-%Y') new_date"), DB::raw('YEAR(m.created_at) year, MONTH(m.created_at) month'))
             ->leftJoin('meganews as m', 'm.id', '=', 'metrics.action_val')
             ->where(function ($query) use ($date1, $date2) {
-                if($date1) {
-                    $query->where('metrics.created_at', '>=', $date1 . ' 00:00:00' );   
+                if ($date1) {
+                    $query->where('metrics.created_at', '>=', $date1 . ' 00:00:00');
                     $query->where('metrics.created_at', '<=', $date2 . ' 23:59:59');
                 }
             })
             ->where('action', 'Meganews')
             ->whereNotNull('action_val')
-            ->groupby('year','month')
+            ->groupby('year', 'month')
             ->get();
 
         $metrics = Metric::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
+            ->get();
 
         return view('pages.admin.conversionRate')
             ->withMetricAllMeganews($metricAllMeganews)
@@ -172,9 +186,9 @@ class MainController extends Controller
             ->withMegatriviaAnswers($megatriviaAnswers);
     }
 
-    public function engagement() 
+    public function engagement()
     {
-        if(isset($_GET['dateRange'])) {
+        if (isset($_GET['dateRange'])) {
             list($date1, $date2) = explode(' - ', $_GET['dateRange']);
         } else {
             $date1 = '';
@@ -182,77 +196,77 @@ class MainController extends Controller
         }
 
         $meganewsLikes = MeganewsLike::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $meganewsComments = MeganewsComment::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $megagoodVibesLikes = MegagoodVibesLike::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $megagoodVibesComments = MegagoodVibesComment::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $bannerQuestionComments = BannerQuestionComment::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $bannerQuestionLikes = BannerQuestionLike::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $megaGoodVibes = MegagoodVibe::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $meganews = Meganews::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
         $bannerQuestions = BannerQuestion::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->get();
-        
+            ->get();
+
 
         return view('pages.admin.engagement')
             ->withMeganews($meganews)
@@ -270,7 +284,7 @@ class MainController extends Controller
 
     public function totalVisits()
     {
-        if(isset($_GET['dateRange'])) {
+        if (isset($_GET['dateRange'])) {
             list($date1, $date2) = explode(' - ', $_GET['dateRange']);
         } else {
             $date1 = '';
@@ -278,22 +292,22 @@ class MainController extends Controller
         }
 
         $users = User::where(function ($query) use ($date1, $date2) {
-            if($date1) {
-                $query->where('created_at', '>=', $date1 . ' 00:00:00' );   
+            if ($date1) {
+                $query->where('created_at', '>=', $date1 . ' 00:00:00');
                 $query->where('created_at', '<=', $date2 . ' 23:59:59');
             }
         })
-        ->groupBy('email')
-        ->get();
+            ->groupBy('email')
+            ->get();
 
         // $users = User::all();
-        $usersMonth = User::where('created_at', 'LIKE', '%'.date('Y-m').'%')
-        ->groupBy('email')
-        ->get();
+        $usersMonth = User::where('created_at', 'LIKE', '%' . date('Y-m') . '%')
+            ->groupBy('email')
+            ->get();
 
-        $usersDay = User::where('created_at', 'LIKE', '%'.date('Y-m-d').'%')
-        ->groupBy('email')
-        ->get();
+        $usersDay = User::where('created_at', 'LIKE', '%' . date('Y-m-d') . '%')
+            ->groupBy('email')
+            ->get();
 
         return view('pages.admin.view-all-total-visits')
             ->withUsers($users)
